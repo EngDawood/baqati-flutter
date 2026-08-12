@@ -40,7 +40,6 @@ dependencies:
   flutter_local_notifications: ^20.1.0
   timezone: ^0.10.1
   shared_preferences: ^2.5.5
-  permission_handler: ^13.0.1
   crypto: ^3.0.7
   # Pinned by flutter_localizations from the Flutter SDK.
   intl: any

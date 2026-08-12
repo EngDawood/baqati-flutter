@@ -7,7 +7,11 @@ plugins {
 
 android {
     namespace = "com.dawood.baqati"
-    compileSdk = flutter.compileSdkVersion
+    // Pinned rather than using flutter.compileSdkVersion (35): the local SDK's
+    // platforms/android-35 directory is an empty, half-installed shell, so the
+    // build tries to re-download it. 36 is fully installed here and is what the
+    // Kotlin reference app compiled against.
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

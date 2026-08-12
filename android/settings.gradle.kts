@@ -14,6 +14,11 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        // Fallbacks: used only if the official hosts above can't be reached, which
+        // happens on networks where dl.google.com / repo.maven.apache.org time out.
+        maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        maven { url = uri("https://maven.aliyun.com/repository/public") }
     }
 }
 
