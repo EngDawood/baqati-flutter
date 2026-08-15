@@ -31,6 +31,10 @@ enum ReminderOutcome {
   /// The user has not granted notification permission.
   permissionDenied,
 
+  /// The user turned reminders off in Settings, or asked for in-app warnings
+  /// only. The event was still stored — just not announced.
+  remindersDisabled,
+
   /// Not running on Android.
   unsupported,
 }
@@ -176,9 +180,7 @@ class NotificationService {
           : AndroidScheduleMode.inexactAllowWhileIdle,
     );
 
-    return exact
-        ? ReminderOutcome.scheduled
-        : ReminderOutcome.scheduledInexact;
+    return exact ? ReminderOutcome.scheduled : ReminderOutcome.scheduledInexact;
   }
 
   /// Shows a notification immediately.

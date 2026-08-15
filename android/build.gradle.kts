@@ -6,7 +6,6 @@ allprojects {
         // happens on networks where dl.google.com / repo.maven.apache.org time out.
         maven { url = uri("https://maven.aliyun.com/repository/google") }
         maven { url = uri("https://maven.aliyun.com/repository/public") }
-        maven { url = uri("https://storage.flutter-io.cn/download.flutter.io") }
     }
 }
 
@@ -43,6 +42,19 @@ subprojects {
                     because("reuse the AGP the app builds with; avoids fetching a second AGP tree")
                 }
             }
+        }
+    }
+}
+
+// Some plugins hardcode their own compileSdk in their Android module — e.g.
+// flutter_local_notifications 20.1.0 declares `compileSdk 35`. Platform 35 is
+// only a half-installed shell in the local SDK (see app/build.gradle.kts), so
+// leaving that as-is makes every build try to re-download it. Force every
+// subproject's Android library module onto the app's compileSdk instead.
+subprojects {
+    afterEvaluate {
+        extensions.findByType(com.android.build.gradle.LibraryExtension::class.java)?.let {
+            it.compileSdk = 36
         }
     }
 }

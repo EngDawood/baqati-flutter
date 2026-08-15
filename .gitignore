@@ -44,8 +44,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Porting reference — separate git repo (native Kotlin implementation)
-baqati
 
 # Design prototype + handoff bundles (not part of the build)
 Package Tracker.dc.html

@@ -2,29 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:baqati/app/app_dependencies.dart';
 import 'package:baqati/router.dart';
-import 'package:baqati/services/settings_service.dart';
 import 'package:baqati/theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Preferences are read before the first frame so navigation never has to
+  // The whole graph is built before the first frame so navigation never has to
   // guess whether the user has already onboarded.
-  final SettingsService settings = await SettingsService.load();
-  runApp(BaqatiApp(settings: settings));
+  final AppDependencies dependencies = await AppDependencies.bootstrap();
+  runApp(BaqatiApp(dependencies: dependencies));
 }
 
 class BaqatiApp extends StatefulWidget {
-  const BaqatiApp({required this.settings, super.key});
+  const BaqatiApp({required this.dependencies, super.key});
 
-  final SettingsService settings;
+  final AppDependencies dependencies;
 
   @override
   State<BaqatiApp> createState() => _BaqatiAppState();
 }
 
 class _BaqatiAppState extends State<BaqatiApp> {
-  late final GoRouter _router = buildRouter(widget.settings);
+  late final GoRouter _router = buildRouter(widget.dependencies);
+
+  @override
+  void dispose() {
+    widget.dependencies.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) => MaterialApp.router(

@@ -8,6 +8,15 @@ import 'package:baqati/utils/arabic_text.dart';
 /// not a chain of alternatives — one message can legitimately produce several
 /// events, and the Kotlin's behavior of accumulating them is preserved.
 abstract final class SmsParser {
+  /// Title given to the main-credit balance row.
+  ///
+  /// Exposed because the dashboard has to exclude this row when picking which
+  /// package to feature: it is an account-wide credit figure, not a package
+  /// with allowances to count down. The Kotlin compared against the same
+  /// literal spelled out inline at two call sites (`HomeScreen.kt:68,74`), so a
+  /// change here silently broke the filter there.
+  static const String mainBalanceTitle = 'الرصيد الأساسي';
+
   /// Yemen is permanently UTC+03:00 and has never observed daylight saving.
   ///
   /// PORT-FIX: the Kotlin parsed carrier date strings with a `SimpleDateFormat`
@@ -27,7 +36,10 @@ abstract final class SmsParser {
   /// would be worse than no capture.
   static const String _filler = r'(?:\s*(?:مبلغ|قدره|وقدره|هو))*\s*';
 
-  static final RegExp _paymentAmount = RegExp('دفعت$_filler' r'([\d.]+)');
+  static final RegExp _paymentAmount = RegExp(
+    'دفعت$_filler'
+    r'([\d.]+)',
+  );
   static final RegExp _paymentDate = RegExp(r'بتاريخ\s*([\d:]+\s+[\d-]+)');
 
   /// Anchored on "الحكومة" exactly as the Kotlin had it, even though the
@@ -38,7 +50,10 @@ abstract final class SmsParser {
   /// message we cannot tell, so the original behavior is preserved rather than
   /// guessed at. If real messages show it never matches, this is the first
   /// thing to revisit.
-  static final RegExp _paymentBalance = RegExp('الحكومة$_filler' r'([\d.]+)');
+  static final RegExp _paymentBalance = RegExp(
+    'الحكومة$_filler'
+    r'([\d.]+)',
+  );
 
   static final RegExp _deductionPackageDotAll = RegExp(
     r'باقة\s+(.*?)\.المبلغ',
@@ -46,7 +61,8 @@ abstract final class SmsParser {
   );
   static final RegExp _deductionPackage = RegExp(r'باقة\s+(.*?)\.');
   static final RegExp _deductionAmount = RegExp(
-    'المبلغ هو$_filler' r'([\d.]+)',
+    'المبلغ هو$_filler'
+    r'([\d.]+)',
   );
 
   // PORT-FIX: the Kotlin matched only the singular nouns. Arabic requires the
@@ -67,7 +83,10 @@ abstract final class SmsParser {
   static const int _megabytesPerGigabyte = 1024;
 
   static final RegExp _activationExpiry = RegExp(r'تاريخ\s*([\d:]+\s+[\d-]+)');
-  static final RegExp _mainBalance = RegExp('رصيدك هو$_filler' r'([\d.]+)');
+  static final RegExp _mainBalance = RegExp(
+    'رصيدك هو$_filler'
+    r'([\d.]+)',
+  );
   static final RegExp _mainBalanceExpiry = RegExp(r'قبل\s*([\d:]+\s+[\d-]+)');
   static final RegExp _validityExpiry = RegExp(
     r'تنتهي صلاحيتها قبل\s*([\d:]+\s+[\d-]+)',
@@ -191,7 +210,7 @@ abstract final class SmsParser {
       PackageEvent(
         type: EventType.balanceCheck,
         timestamp: nowMillis,
-        title: 'الرصيد الأساسي',
+        title: mainBalanceTitle,
         description: '${_number(balance)} ريال',
         // PORT-FIX: the Kotlin put remaining credit in `cost`, a field meaning
         // "money spent". Any future total-spent aggregate would have silently

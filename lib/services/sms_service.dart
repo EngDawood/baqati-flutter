@@ -24,11 +24,9 @@ class RawSmsMessage {
 /// Android-only by nature: iOS exposes no equivalent API. Every call degrades
 /// to a safe no-op elsewhere rather than throwing.
 class SmsService {
-  SmsService({
-    MethodChannel? methodChannel,
-    EventChannel? eventChannel,
-  }) : _method = methodChannel ?? const MethodChannel(_methodChannelName),
-       _events = eventChannel ?? const EventChannel(_eventChannelName);
+  SmsService({MethodChannel? methodChannel, EventChannel? eventChannel})
+    : _method = methodChannel ?? const MethodChannel(_methodChannelName),
+      _events = eventChannel ?? const EventChannel(_eventChannelName);
 
   static const String _methodChannelName = 'baqati/sms';
   static const String _eventChannelName = 'baqati/sms_stream';

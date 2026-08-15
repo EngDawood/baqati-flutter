@@ -39,6 +39,17 @@ class PackageRepository extends ChangeNotifier {
     return inserted;
   }
 
+  /// Returns the newly-written events with their row ids, skipping duplicates.
+  Future<List<PackageEvent>> insertAllReturningInserted(
+    List<PackageEvent> events,
+  ) async {
+    final List<PackageEvent> inserted = await _dao.insertAllReturningInserted(
+      events,
+    );
+    if (inserted.isNotEmpty) notifyListeners();
+    return inserted;
+  }
+
   Future<void> deleteById(int id) async {
     await _dao.deleteById(id);
     notifyListeners();

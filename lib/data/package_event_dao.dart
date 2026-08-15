@@ -99,6 +99,37 @@ class PackageEventDao {
     return inserted;
   }
 
+  /// Inserts [events] in one transaction, returning those that were actually
+  /// written, each carrying the row id SQLite assigned it.
+  ///
+  /// [insertAll] returns only a count, which is enough to tell the user how
+  /// many events were found but not enough to act on them.
+  /// `NotificationService.scheduleExpiryReminder` keys its notification on the
+  /// row id — deliberately, so that two packages sharing a title cannot cancel
+  /// each other's reminder — so the sync layer cannot schedule anything without
+  /// the ids coming back out of the insert.
+  Future<List<PackageEvent>> insertAllReturningInserted(
+    List<PackageEvent> events,
+  ) async {
+    if (events.isEmpty) return const <PackageEvent>[];
+
+    final Database db = await _db.database;
+    final List<PackageEvent> inserted = <PackageEvent>[];
+
+    await db.transaction((Transaction txn) async {
+      for (final PackageEvent event in events) {
+        final int id = await txn.insert(
+          PackageEvent.tableName,
+          event.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.ignore,
+        );
+        if (id != 0) inserted.add(event.copyWith(id: id));
+      }
+    });
+
+    return inserted;
+  }
+
   Future<void> deleteById(int id) async {
     final Database db = await _db.database;
     await db.delete(
